@@ -1,36 +1,34 @@
-import PropTypes from 'prop-types';
-import { nanoid } from 'nanoid';
-import css from './ContactList.module.css';
+import { useSelector } from 'react-redux';
+import { getContacts } from '../../redux/contactsSlice';
+import { getFilter } from '../../redux/filterSlice';
 
-function ContactsList({ contacts, onDelete }) {
-  return (
-    <ul className={css.list}>
-      {contacts.map(({ name, number, id }) => (
-        <li className={css.item} key={nanoid()}>
-          <p className={css.text}>
-            {name}: {number}
-          </p>
-          <button
-            className={css.btn}
-            type="button"
-            onClick={() => onDelete(id)}
-          >
-            Delete
-          </button>
-        </li>
-      ))}
-    </ul>
+import { ContactItem } from '../ContactItem/ContactItem';
+import { List, Item, Notice } from './ContactsList.styled';
+
+//----Получаем подходящие контакты----
+function getVisibleContacts(contacts, filter) {
+  const normalizedFilter = filter.toLowerCase();
+
+  return contacts.filter(contact =>
+    contact.name.toLowerCase().includes(normalizedFilter)
   );
 }
-export default ContactsList;
 
-ContactsList.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-      id: PropTypes.string.isRequired,
-    }).isRequired
-  ).isRequired,
-  onDelete: PropTypes.func.isRequired,
+export const ContactsList = () => {
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
+  const visibleContacts = getVisibleContacts(contacts, filter);
+
+  //----Рендер----
+  return visibleContacts.length > 0 ? (
+    <List>
+      {visibleContacts.map(contact => (
+        <Item key={contact.id}>
+          <ContactItem contact={contact} />
+        </Item>
+      ))}
+    </List>
+  ) : (
+    <Notice>There is nothing to show... ☹️</Notice>
+  );
 };
