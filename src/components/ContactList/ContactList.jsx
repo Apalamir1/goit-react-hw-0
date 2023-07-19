@@ -29,6 +29,6 @@ export const ContactsList = () => {
       ))}
     </List>
   ) : (
-    <Notice>There is nothing to show... ☹️</Notice>
+    <Notice>There is nothing to show... </Notice>
   );
 };
